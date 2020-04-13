@@ -17,43 +17,36 @@ const benchmark = func => {
   return new Date().valueOf() - start;
 };
 
+const benchmarks = obj => _.mapValues(obj, func => benchmark(() => func()));
+
 export default function App() {
   const date = "2020-03-26";
 
-  const parse = _.mapValues(
-    {
-      moment: () => moment(date),
-      date: () => new Date(date),
-      dayjs: () => dayjs(date)
-    },
-    func => benchmark(() => func())
-  );
+  const parse = benchmarks({
+    moment: () => moment(date),
+    date: () => new Date(date),
+    dayjs: () => dayjs(date)
+  });
 
   const m = moment(date);
   const d = new Date(date);
   const djs = dayjs(date);
 
-  const format = _.mapValues(
-    {
-      moment: () => m.format("MM/DD"),
-      date: () => sprintf("%02d/%02d", d.getMonth() + 1, d.getDate()),
-      dayjs: () => djs.format("MM/DD")
-    },
-    func => benchmark(() => func())
-  );
+  const format = benchmarks({
+    moment: () => m.format("MM/DD"),
+    date: () => sprintf("%02d/%02d", d.getMonth() + 1, d.getDate()),
+    dayjs: () => djs.format("MM/DD")
+  });
 
-  const addSubtract = _.mapValues(
-    {
-      moment: () =>
-        m
-          .clone()
-          .add(1, "h")
-          .subtract(1, "d"),
-      date: () => new Date(d.valueOf() + MS_OF_HOUR - MS_OF_DAY),
-      dayjs: () => djs.add(1, "h").subtract(1, "d")
-    },
-    func => benchmark(() => func())
-  );
+  const addSubtract = benchmarks({
+    moment: () =>
+      m
+        .clone()
+        .add(1, "h")
+        .subtract(1, "d"),
+    date: () => new Date(d.valueOf() + MS_OF_HOUR - MS_OF_DAY),
+    dayjs: () => djs.add(1, "h").subtract(1, "d")
+  });
 
   const Result = ({ title, input }) => (
     <div style={{ marginTop: 8 }}>
