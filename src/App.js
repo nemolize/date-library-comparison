@@ -24,8 +24,8 @@ export default function App() {
 
   const parse = benchmarks({
     moment: () => moment(date),
-    date: () => new Date(date),
-    dayjs: () => dayjs(date)
+    dayjs: () => dayjs(date),
+    date: () => new Date(date)
   });
 
   const m = moment(date);
@@ -34,8 +34,8 @@ export default function App() {
 
   const format = benchmarks({
     moment: () => m.format("MM/DD"),
-    date: () => sprintf("%02d/%02d", d.getMonth() + 1, d.getDate()),
-    dayjs: () => djs.format("MM/DD")
+    dayjs: () => djs.format("MM/DD"),
+    date: () => sprintf("%02d/%02d", d.getMonth() + 1, d.getDate())
   });
 
   const addSubtract = benchmarks({
@@ -44,8 +44,8 @@ export default function App() {
         .clone()
         .add(1, "h")
         .subtract(1, "d"),
-    date: () => new Date(d.valueOf() + MS_OF_HOUR - MS_OF_DAY),
-    dayjs: () => djs.add(1, "h").subtract(1, "d")
+    dayjs: () => djs.add(1, "h").subtract(1, "d"),
+    date: () => new Date(d.valueOf() + MS_OF_HOUR - MS_OF_DAY)
   });
 
   const Result = ({ title, input }) => (
