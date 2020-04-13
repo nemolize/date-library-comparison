@@ -1,3 +1,7 @@
+This repository is `Deprecated`. You should see the following repository to get detailed date library comparison.
+
+[You-Dont-Need-Momentjs](https://github.com/you-dont-need/You-Dont-Need-Momentjs)
+
 # Date library comparison
 
 Performance benchmarks between the following libraries.
