@@ -3,60 +3,79 @@ import "./styles.css";
 import moment from "moment";
 import dayjs from "dayjs";
 import { sprintf } from "sprintf-js";
+import _ from "lodash";
 
 moment.locale("ja");
 dayjs.locale("ja");
 const COUNT = 10000;
+const MS_OF_HOUR = 1000 * 60 * 60;
+const MS_OF_DAY = MS_OF_HOUR * 24;
 
 const benchmark = func => {
   const start = new Date().valueOf();
-  func();
+  for (let i = 0; i < COUNT; i++) func();
   return new Date().valueOf() - start;
 };
 
 export default function App() {
   const date = "2020-03-26";
 
-  const momentResult = moment(date).valueOf();
+  const parse = _.mapValues(
+    {
+      moment: () => moment(date),
+      date: () => new Date(date),
+      dayjs: () => dayjs(date)
+    },
+    func => benchmark(() => func())
+  );
+
+  const m = moment(date);
   const d = new Date(date);
-  // タイムゾーンを合わせる
-  const dateResult = d.getTime() + d.getTimezoneOffset() * 60 * 1000;
-  const dayjsResult = dayjs(date).valueOf();
+  const djs = dayjs(date);
 
-  // 一応結果検証
-  console.assert(momentResult === dateResult && dateResult && dayjsResult, {
-    momentResult,
-    dateResult,
-    dayjsResult
-  });
+  const format = _.mapValues(
+    {
+      moment: () => m.format("MM/DD"),
+      date: () => sprintf("%02d/%02d", d.getMonth() + 1, d.getDate()),
+      dayjs: () => djs.format("MM/DD")
+    },
+    func => benchmark(() => func())
+  );
 
-  const momentTime = benchmark(() => {
-    for (let i = 0; i <= COUNT; i++) moment(date).format("MM/DD");
-  });
-  const dateTime = benchmark(() => {
-    for (let i = 0; i <= COUNT; i++) {
-      const d = new Date(date);
-      sprintf("%02d/%02d", d.getMonth() + 1, d.getDate());
-    }
-  });
-  const dayjsTime = benchmark(() => {
-    for (let i = 0; i <= COUNT; i++) dayjs(date).format("MM/DD");
-  });
+  const addSubtract = _.mapValues(
+    {
+      moment: () =>
+        m
+          .clone()
+          .add(1, "h")
+          .subtract(1, "d"),
+      date: () => new Date(d.valueOf() + MS_OF_HOUR - MS_OF_DAY),
+      dayjs: () => djs.add(1, "h").subtract(1, "d")
+    },
+    func => benchmark(() => func())
+  );
+
+  const Result = ({ title, input }) => (
+    <div style={{ marginTop: 8 }}>
+      <strong>{title}</strong>
+      {Object.keys(input).map(k => {
+        return (
+          <div key={k}>
+            {k}: {input[k]}ms
+          </div>
+        );
+      })}
+    </div>
+  );
 
   return (
     <div className="App">
       <h1>moment vs Date vs dayjs performance comparison</h1>
       <div>Time for parse and format {COUNT} times.</div>
       <br />
-      <div>moment: {momentTime} ms</div>
-      <div>Date: {dateTime} ms</div>
-      <div>dayjs: {dayjsTime} ms</div>
-      <br />
-      <strong>
-        dayjs is {(momentTime / dayjsTime).toFixed(1)}x faster than moment
-        <br />
-        Date is {(momentTime / dateTime).toFixed(1)}x faster than moment
-      </strong>
+      <Result title={"parse"} input={parse} />
+      <Result title={"format"} input={format} />
+      <Result title={"add/subtract"} input={addSubtract} />
     </div>
   );
 }
