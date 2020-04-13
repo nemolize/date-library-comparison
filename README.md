@@ -17,4 +17,4 @@ The benchmark measures each of the following operations.
 |  Formatting|   16ms| 39ms|10ms|
 |Add/Subtract|   35ms| 34ms| 2ms|
 
-You can see result of this benchmark on your machine [here](https://codesandbox.io/s/github/nemolize/date-library-comparison)
+You can preview this repository on [CodeSandbox live editor](https://codesandbox.io/s/github/nemolize/date-library-comparison)
